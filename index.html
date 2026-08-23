@@ -36,17 +36,13 @@ html,body{margin:0;padding:0;background:#3B060B;font-synthesis-weight:none;}
 .stream-cd{margin:8px 0 0;font-family:'Marcellus',serif;font-size:clamp(24px,5.6vw,38px);color:#C9962F;font-variant-numeric:tabular-nums;letter-spacing:.04em;}
 .stream-cd i{font-style:normal;font-size:.46em;color:#EBCB84;opacity:.72;margin:0 .55em 0 .12em;}
 /* floating call to action, centred so it is hard to miss */
-#wishJump{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);z-index:60;display:inline-flex;align-items:center;gap:11px;height:56px;padding:0 28px;border-radius:28px;background:#5E0B12;color:#EBCB84;border:2px solid #C9962F;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-weight:400;font-size:18px;line-height:1;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.5);transition:transform .2s ease,background .2s ease;}
+#wishJump{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);z-index:60;display:inline-flex;align-items:center;gap:11px;height:56px;padding:0 28px;border-radius:28px;background:#5E0B12;color:#EBCB84;border:2px solid #C9962F;font-family:'Marcellus',serif;font-weight:400;font-size:15px;letter-spacing:.18em;text-transform:uppercase;line-height:1;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.5);transition:transform .2s ease,background .2s ease;}
 #wishJump:hover{transform:translateX(-50%) scale(1.05);background:#C9962F;color:#3B060B;}
 #wishJump:focus-visible{outline:3px solid #EBCB84;outline-offset:4px;}
 #wishJump svg{width:21px;height:21px;fill:currentColor;flex:none;}
-.wish-short{display:none;}
-.jump-en{font-family:'Marcellus',serif;font-size:.66em;letter-spacing:.14em;text-transform:uppercase;margin-left:.55em;}
 /* shorten the label before it can reach the music button in the corner */
 @media (max-width:520px){
-  #wishJump{font-size:16.5px;height:52px;padding:0 22px;gap:9px;}
-  .wish-long{display:none;}
-  .wish-short{display:inline;}
+  #wishJump{font-size:13.5px;height:52px;padding:0 22px;gap:9px;letter-spacing:.14em;}
 }
 /* on the narrowest phones the centred pill can reach the corner, so lift
    the music button above it rather than shrinking the label away */
@@ -367,7 +363,7 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
 
 <button type="button" id="wishJump" aria-label="Send your wishes" title="Send your wishes">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v.4l-10 6.3L2 5.4z"/><path d="M22 7.6V19a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.6l10 6.3z"/></svg>
-  <span class="wish-long">வாழ்த்து சொல்லுங்கள்<span class="jump-en">· Leave a wish</span></span><span class="wish-short">வாழ்த்து<span class="jump-en">· Wish</span></span>
+  <span>Send wishes</span>
 </button>
 <button id="music" aria-pressed="false" aria-label="Play background music" title="Music">
   <svg class="playing" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.6A4 4 0 1 0 14 17V7.5h4V3z"/></svg>
