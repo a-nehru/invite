@@ -41,6 +41,7 @@ html,body{margin:0;padding:0;background:#3B060B;font-synthesis-weight:none;}
 #wishJump:focus-visible{outline:3px solid #EBCB84;outline-offset:4px;}
 #wishJump svg{width:21px;height:21px;fill:currentColor;flex:none;}
 .wish-short{display:none;}
+.jump-en{font-family:'Marcellus',serif;font-size:.66em;letter-spacing:.14em;text-transform:uppercase;margin-left:.55em;}
 /* shorten the label before it can reach the music button in the corner */
 @media (max-width:520px){
   #wishJump{font-size:16.5px;height:52px;padding:0 22px;gap:9px;}
@@ -345,7 +346,8 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
 
     <footer style="text-align:center;padding:32px clamp(16px,6vw,56px) 48px;">
       <p style="margin:0 auto;max-width:44em;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-size:clamp(15px,2.6vw,18px);line-height:2;color:#5E0B12;">அன்பும் அறனும் உடைத்தாயின் இல்வாழ்க்கை<br>பண்பும் பயனும் அது</p>
-      <p style="margin:8px 0 28px;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#C9962F;">— குறள் 71</p>
+      <p style="margin:12px auto 0;max-width:38em;font-family:'Marcellus',serif;font-size:13.5px;line-height:1.8;color:#C9962F;">A household that holds love and virtue &mdash;<br>that is its nature, and its reward.</p>
+      <p style="margin:10px 0 28px;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#C9962F;">— திருக்குறள் · Thirukkural 45</p>
       <p style="margin:0;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-weight:400;font-size:clamp(20px,3.6vw,26px);color:#5E0B12;">வாழ்க வளமுடன்</p>
       <p style="margin:8px 0 0;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:#C9962F;">With your blessings</p>
     </footer>
@@ -365,7 +367,7 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
 
 <button type="button" id="wishJump" aria-label="Send your wishes" title="Send your wishes">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v.4l-10 6.3L2 5.4z"/><path d="M22 7.6V19a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.6l10 6.3z"/></svg>
-  <span class="wish-long">வாழ்த்து சொல்லுங்கள்</span><span class="wish-short">வாழ்த்து</span>
+  <span class="wish-long">வாழ்த்து சொல்லுங்கள்<span class="jump-en">· Leave a wish</span></span><span class="wish-short">வாழ்த்து<span class="jump-en">· Wish</span></span>
 </button>
 <button id="music" aria-pressed="false" aria-label="Play background music" title="Music">
   <svg class="playing" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.6A4 4 0 1 0 14 17V7.5h4V3z"/></svg>
