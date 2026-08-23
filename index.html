@@ -244,6 +244,8 @@ const MUSIC_TRACKS = [
   "zkvNnRjIhPE",
   "1joa2NU0Sno"
 ];
+const MUSIC_START_SECONDS = 60;  // skip the first minute of the opening track
+const MUSIC_VOLUME        = 28;  // 0-100, background level
 // ==================================================
 
 const MUHURTHAM = Date.parse("2026-08-31T14:15:00Z"); // 10:15 AM EDT = 7:45 PM IST
@@ -309,42 +311,75 @@ setInterval(tick, 1000);
   const btn = el("music");
   let player, ready = false;
 
+  function setPressed(on){
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.setAttribute("aria-label", on ? "Pause background music" : "Play background music");
+  }
+
   const tag = document.createElement("script");
   tag.src = "https://www.youtube.com/iframe_api";
   document.head.appendChild(tag);
 
   window.onYouTubeIframeAPIReady = function(){
     player = new YT.Player("yt-player", {
-      playerVars:{ autoplay:1, mute:1, controls:0, playsinline:1, rel:0, modestbranding:1 },
+      playerVars:{ autoplay:1, controls:0, playsinline:1, rel:0, modestbranding:1 },
       events:{
         onReady(e){
           ready = true;
-          e.target.setVolume(28);
-          e.target.mute();                                  // stay silent until a gesture
-          e.target.loadPlaylist({ playlist: MUSIC_TRACKS }); // queue every track in order
-          e.target.setLoop(true);                            // ...and start over at the end
+          e.target.setVolume(MUSIC_VOLUME);
+          e.target.unMute();                       // ask for sound straight away
+          e.target.loadPlaylist({
+            playlist: MUSIC_TRACKS,
+            index: 0,
+            startSeconds: MUSIC_START_SECONDS      // begin a minute in
+          });
+          e.target.setLoop(true);
+
+          // Most browsers block audible autoplay. If we were blocked, drop to a
+          // muted start so something is running, and unmute on the first gesture.
+          setTimeout(function(){
+            if (!player) return;
+            if (player.getPlayerState() === YT.PlayerState.PLAYING && !player.isMuted()){
+              setPressed(true);                    // sound worked outright
+            } else {
+              player.mute();
+              player.playVideo();
+            }
+          }, 1500);
+        },
+        onStateChange(e){
+          if (e.data === YT.PlayerState.PLAYING && !e.target.isMuted()) setPressed(true);
         }
       }
     });
   };
 
-  // Browsers block audible autoplay; unmute on the visitor's first gesture.
-  function wake(){
-    if (ready && player.isMuted && player.isMuted()){
-      player.unMute(); player.playVideo();
-      btn.setAttribute("aria-pressed","true");
-      btn.setAttribute("aria-label","Pause background music");
+  // First gesture anywhere unmutes, for the browsers that blocked us above.
+  // Taps on the button itself are skipped so its own handler isn't double-fired.
+  function wake(ev){
+    if (ev && ev.target && ev.target.closest && ev.target.closest("#music")) return;
+    if (!ready) return;
+    if (player.isMuted && player.isMuted()){
+      player.unMute();
+      player.setVolume(MUSIC_VOLUME);
+      player.playVideo();
+      setPressed(true);
     }
-    ["pointerdown","keydown","touchstart"].forEach(ev => document.removeEventListener(ev, wake));
+    ["pointerdown","keydown","touchstart"].forEach(e => document.removeEventListener(e, wake));
   }
-  ["pointerdown","keydown","touchstart"].forEach(ev => document.addEventListener(ev, wake, {passive:true}));
+  ["pointerdown","keydown","touchstart"].forEach(e => document.addEventListener(e, wake, {passive:true}));
 
   btn.addEventListener("click", function(){
     if (!ready) return;
     const on = btn.getAttribute("aria-pressed") === "true";
-    if (on) player.pauseVideo(); else { player.unMute(); player.playVideo(); }
-    btn.setAttribute("aria-pressed", on ? "false" : "true");
-    btn.setAttribute("aria-label", on ? "Play background music" : "Pause background music");
+    if (on){
+      player.pauseVideo();
+    } else {
+      player.unMute();
+      player.setVolume(MUSIC_VOLUME);
+      player.playVideo();
+    }
+    setPressed(!on);
   });
 })();
 </script>
