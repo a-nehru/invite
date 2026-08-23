@@ -35,6 +35,21 @@ html,body{margin:0;padding:0;background:#3B060B;font-synthesis-weight:none;}
 .stream-en{margin:0;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#EBCB84;}
 .stream-cd{margin:8px 0 0;font-family:'Marcellus',serif;font-size:clamp(24px,5.6vw,38px);color:#C9962F;font-variant-numeric:tabular-nums;letter-spacing:.04em;}
 .stream-cd i{font-style:normal;font-size:.46em;color:#EBCB84;opacity:.72;margin:0 .55em 0 .12em;}
+.wish-jump{display:inline-flex;align-items:center;gap:8px;margin-top:22px;background:transparent;color:#5E0B12;font-family:'Marcellus',serif;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;padding:11px 22px;border:1.5px solid #C9962F;cursor:pointer;transition:background .2s ease,color .2s ease;}
+.wish-jump:hover{background:#5E0B12;color:#EBCB84;}
+.wish-jump:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
+.wish-form{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:15px;}
+.wish-field{display:flex;flex-direction:column;gap:6px;text-align:left;}
+.wish-label{font-family:'Marcellus',serif;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#C9962F;}
+.wish-input,.wish-textarea{width:100%;background:#F5E7CB;border:2px solid #C9962F;color:#33190F;font-family:'Mukta Malar',sans-serif;font-size:16px;padding:11px 13px;box-sizing:border-box;border-radius:0;}
+.wish-textarea{min-height:118px;resize:vertical;line-height:1.65;}
+.wish-input:focus,.wish-textarea:focus{outline:3px solid #5E0B12;outline-offset:2px;}
+.wish-send{align-self:center;margin-top:4px;background:#C9962F;color:#3B060B;font-family:'Marcellus',serif;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;padding:13px 30px;border:2px solid #C9962F;cursor:pointer;transition:background .2s ease,color .2s ease;}
+.wish-send:hover:not(:disabled){background:transparent;color:#5E0B12;}
+.wish-send:disabled{opacity:.55;cursor:default;}
+.wish-send:focus-visible{outline:3px solid #5E0B12;outline-offset:3px;}
+.wish-status{margin:4px 0 0;min-height:1.4em;font-size:14px;color:#5E0B12;text-align:center;}
+.wish-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
 .watch-btn{display:inline-flex;align-items:center;gap:9px;background:#C9962F;color:#3B060B;font-family:'Marcellus',serif;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;padding:13px 26px;text-decoration:none;border:2px solid #C9962F;transition:background .2s ease,color .2s ease;}
 .watch-btn:hover{background:transparent;color:#C9962F;}
 .watch-btn:focus-visible{outline:3px solid #EBCB84;outline-offset:3px;}
@@ -130,6 +145,7 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
       </div>
       <p style="margin:26px auto 0;max-width:44em;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-size:clamp(15px,2.6vw,18px);line-height:2;color:#5E0B12;animation:fadeUp .8s ease .3s both;">எங்கள் திருமண முகூர்த்தத்தை நேரலையில் கண்டு, உங்கள் அன்பான ஆசிகளை வழங்குமாறு அன்புடன் அழைக்கிறோம்.</p>
       <p style="margin:10px auto 0;max-width:46em;font-size:13px;color:#C9962F;">We warmly invite you to watch our wedding muhurtham live and bless us.</p>
+      <button type="button" class="wish-jump" id="wishJump">வாழ்த்து சொல்லுங்கள் · Leave a wish</button>
     </header>
 
     <div style="display:flex;align-items:center;gap:16px;padding:40px clamp(16px,6vw,56px) 0;" aria-hidden="true">
@@ -249,6 +265,41 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
       <div style="flex:1;height:1px;background:#C9962F;opacity:.55;"></div>
     </div>
 
+    <div style="display:flex;align-items:center;gap:16px;padding:40px clamp(16px,6vw,56px) 0;" aria-hidden="true">
+      <div style="flex:1;height:1px;background:#C9962F;opacity:.55;"></div>
+      <svg width="54" height="32" viewBox="0 0 118 66"><g fill="none" stroke="#C9962F" stroke-width="3"><circle cx="59" cy="19" r="13"></circle><circle cx="59" cy="47" r="13"></circle><circle cx="45" cy="33" r="13"></circle><circle cx="73" cy="33" r="13"></circle></g><circle cx="59" cy="33" r="4" fill="#5E0B12"></circle></svg>
+      <div style="flex:1;height:1px;background:#C9962F;opacity:.55;"></div>
+    </div>
+
+    <section id="wishes" style="padding:32px clamp(16px,6vw,56px) 0;">
+      <div style="text-align:center;">
+        <h2 style="margin:0;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-weight:400;font-size:clamp(22px,4vw,28px);color:#5E0B12;">வாழ்த்துக்கள்</h2>
+        <p style="margin:6px 0 8px;font-family:'Marcellus',serif;font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:#C9962F;">Send your wishes</p>
+        <p style="margin:0 auto 26px;max-width:44em;font-size:14px;color:#C9962F;">A line from you means a great deal. Write it here and it reaches us directly.</p>
+      </div>
+
+      <form class="wish-form" id="wishForm" novalidate>
+        <div class="wish-field">
+          <label class="wish-label" for="wishName">Your name · உங்கள் பெயர்</label>
+          <input class="wish-input" type="text" id="wishName" name="name" autocomplete="name" maxlength="80" required>
+        </div>
+        <div class="wish-field">
+          <label class="wish-label" for="wishText">Your wish · உங்கள் வாழ்த்து</label>
+          <textarea class="wish-textarea" id="wishText" name="message" maxlength="1200" required></textarea>
+        </div>
+        <div class="wish-hp" aria-hidden="true">
+          <label>Leave this empty<input type="text" id="wishBot" name="botcheck" tabindex="-1" autocomplete="off"></label>
+        </div>
+        <button class="wish-send" type="submit" id="wishSend">Send</button>
+        <p class="wish-status" id="wishStatus" role="status" aria-live="polite"></p>
+      </form>
+
+      <p id="wishClosed" style="display:none;text-align:center;margin:0;font-size:14px;color:#C9962F;">
+        வாழ்த்து பெட்டி விரைவில் திறக்கும்<br>
+        <span style="font-family:'Marcellus',serif;font-size:11px;letter-spacing:.26em;text-transform:uppercase;">Wishes open shortly</span>
+      </p>
+    </section>
+
     <footer style="text-align:center;padding:32px clamp(16px,6vw,56px) 48px;">
       <p style="margin:0 auto;max-width:44em;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-size:clamp(15px,2.6vw,18px);line-height:2;color:#5E0B12;">அன்பும் அறனும் உடைத்தாயின் இல்வாழ்க்கை<br>பண்பும் பயனும் அது</p>
       <p style="margin:8px 0 28px;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#C9962F;">— குறள் 71</p>
@@ -286,6 +337,10 @@ const MUSIC_TRACKS = [
   "1joa2NU0Sno",
   "zkvNnRjIhPE"
 ];
+// Wishes form — get a free access key at https://web3forms.com (takes a minute)
+const WISHES_ACCESS_KEY = "";                        // paste the key here
+const WISHES_CC         = "asekar7@outlook.com";     // second recipient
+
 const MUSIC_START_SECONDS = 25;  // where the opening track starts, in seconds
 const MUSIC_VOLUME        = 28;  // 0-100, background level
 // ==================================================
@@ -361,6 +416,76 @@ setInterval(tick, 1000);
   } else {
     el("watchLink").style.display = "none";   // nothing to open yet
   }
+})();
+
+/* ---------- wishes ---------- */
+(function(){
+  const jump = el("wishJump");
+  if (jump){
+    jump.addEventListener("click", function(){
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      el("wishes").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      setTimeout(function(){ el("wishName").focus({preventScroll:true}); }, reduce ? 0 : 600);
+    });
+  }
+
+  const form = el("wishForm"), status = el("wishStatus"), send = el("wishSend");
+
+  // No key configured yet: show a holding line rather than a form that fails.
+  if (!WISHES_ACCESS_KEY){
+    form.style.display = "none";
+    el("wishClosed").style.display = "";
+    if (jump) jump.style.display = "none";
+    return;
+  }
+
+  function say(msg, ok){
+    status.textContent = msg;
+    status.style.color = ok === false ? "#8A2A1B" : "#5E0B12";
+  }
+
+  form.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    if (el("wishBot").value) return;              // honeypot tripped, ignore silently
+
+    const name = el("wishName").value.trim();
+    const wish = el("wishText").value.trim();
+    if (!name || !wish){
+      say("Please add your name and a few words.", false);
+      return;
+    }
+
+    send.disabled = true;
+    say("Sending…");
+
+    fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        access_key: WISHES_ACCESS_KEY,
+        cc: WISHES_CC,
+        subject: "A wedding wish from " + name,
+        from_name: "Aravind & Anupama invitation",
+        name: name,
+        message: wish
+      })
+    })
+    .then(function(r){ return r.json().catch(function(){ return {success:false}; }); })
+    .then(function(d){
+      if (d && d.success){
+        form.reset();
+        say("நன்றி — your wish has reached us.");
+        send.textContent = "Sent";
+      } else {
+        send.disabled = false;
+        say("That didn't send. Please try again in a moment.", false);
+      }
+    })
+    .catch(function(){
+      send.disabled = false;
+      say("That didn't send — check your connection and try again.", false);
+    });
+  });
 })();
 
 /* ---------- background music ---------- */
