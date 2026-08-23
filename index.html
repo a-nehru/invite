@@ -27,6 +27,14 @@
   font-weight:400; font-style:normal; font-display:swap;
 }
 html,body{margin:0;padding:0;background:#3B060B;}
+.stream-pane{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;padding:20px;box-sizing:border-box;}
+.stream-ta{margin:0;font-family:'Noto Serif Tamil',serif;font-size:clamp(16px,3.4vw,20px);color:#F5E7CB;}
+.stream-en{margin:0;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#EBCB84;}
+.stream-cd{margin:8px 0 0;font-family:'Marcellus',serif;font-size:clamp(24px,5.6vw,38px);color:#C9962F;font-variant-numeric:tabular-nums;letter-spacing:.04em;}
+.stream-cd i{font-style:normal;font-size:.46em;color:#EBCB84;opacity:.72;margin:0 .55em 0 .12em;}
+.watch-btn{display:inline-flex;align-items:center;gap:9px;background:#C9962F;color:#3B060B;font-family:'Marcellus',serif;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;padding:13px 26px;text-decoration:none;border:2px solid #C9962F;transition:background .2s ease,color .2s ease;}
+.watch-btn:hover{background:transparent;color:#C9962F;}
+.watch-btn:focus-visible{outline:3px solid #EBCB84;outline-offset:3px;}
 a{color:#5E0B12;} a:hover{color:#C9962F;}
 a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
@@ -203,14 +211,33 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
       </div>
 
       <div id="noEmbed" style="position:relative;padding-top:56.25%;background:#5E0B12;border:3px solid #C9962F;box-sizing:border-box;">
-        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:20px;box-sizing:border-box;">
-          <svg width="72" height="40" viewBox="0 0 118 66" aria-hidden="true"><g fill="none" stroke="#C9962F" stroke-width="3"><circle cx="59" cy="19" r="13"></circle><circle cx="59" cy="47" r="13"></circle><circle cx="45" cy="33" r="13"></circle><circle cx="73" cy="33" r="13"></circle></g><circle cx="59" cy="33" r="4" fill="#EBCB84"></circle></svg>
-          <p style="margin:0;font-family:'Noto Serif Tamil',serif;font-size:18px;color:#F5E7CB;">நேரலை இணைப்பு விரைவில்</p>
-          <p style="margin:0;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#EBCB84;">Stream link coming soon</p>
+
+        <div id="streamPending" class="stream-pane">
+          <svg width="64" height="36" viewBox="0 0 118 66" aria-hidden="true"><g fill="none" stroke="#C9962F" stroke-width="3"><circle cx="59" cy="19" r="13"></circle><circle cx="59" cy="47" r="13"></circle><circle cx="45" cy="33" r="13"></circle><circle cx="73" cy="33" r="13"></circle></g><circle cx="59" cy="33" r="4" fill="#EBCB84"></circle></svg>
+          <p class="stream-ta">நேரலை தொடங்க</p>
+          <p class="stream-en">Streaming starts in</p>
+          <p class="stream-cd" id="streamCountdown">00<i>d</i>00<i>h</i>00<i>m</i>00<i>s</i></p>
         </div>
+
+        <div id="streamLiveNow" class="stream-pane" style="display:none;">
+          <span style="display:inline-flex;align-items:center;gap:11px;background:#3B060B;border:1px solid #C9962F;padding:11px 22px;">
+            <span style="width:11px;height:11px;border-radius:50%;background:#E3A43A;animation:livePulse 1.6s ease infinite;"></span>
+            <span style="font-family:'Noto Serif Tamil',serif;font-size:18px;color:#F5E7CB;">நேரலை இப்போது</span>
+          </span>
+          <p class="stream-en" style="margin-top:4px;">The ceremony is streaming now</p>
+        </div>
+
+        <div id="streamEnded" class="stream-pane" style="display:none;">
+          <svg width="64" height="36" viewBox="0 0 118 66" aria-hidden="true"><g fill="none" stroke="#C9962F" stroke-width="3"><circle cx="59" cy="19" r="13"></circle><circle cx="59" cy="47" r="13"></circle><circle cx="45" cy="33" r="13"></circle><circle cx="73" cy="33" r="13"></circle></g><circle cx="59" cy="33" r="4" fill="#EBCB84"></circle></svg>
+          <p class="stream-ta">நேரலை நிறைவடைந்தது</p>
+          <p class="stream-en">The stream has ended · Thank you</p>
+        </div>
+
       </div>
 
-      <p style="text-align:center;margin:14px 0 0;font-size:13px;letter-spacing:.08em;"><a id="watchLink" href="https://www.youtube.com" target="_blank" rel="noopener" style="color:#C9962F;text-decoration:underline;text-underline-offset:3px;">Open on YouTube ↗</a></p>
+      <p style="text-align:center;margin:22px 0 0;">
+        <a id="watchLink" class="watch-btn" href="https://www.youtube.com" target="_blank" rel="noopener">Open on YouTube ↗</a>
+      </p>
     </section>
 
     <div style="display:flex;align-items:center;gap:16px;padding:40px clamp(16px,6vw,56px) 0;" aria-hidden="true">
@@ -284,17 +311,30 @@ function tick(){
   const diff = MUHURTHAM - now;
   const isBefore = diff > 0;
   const isLive   = !isBefore && now < MUHURTHAM + LIVE_WINDOW_MS;
+  const isAfter  = !isBefore && !isLive;
 
   el("stateBefore").style.display = isBefore ? "" : "none";
   el("stateLive").style.display   = isLive   ? "" : "none";
-  el("stateAfter").style.display  = (!isBefore && !isLive) ? "" : "none";
+  el("stateAfter").style.display  = isAfter  ? "" : "none";
+
+  // The livestream panel mirrors the same three states, so a guest who lands
+  // straight on it still learns when to come back.
+  el("streamPending").style.display = isBefore ? "" : "none";
+  el("streamLiveNow").style.display = isLive   ? "" : "none";
+  el("streamEnded").style.display   = isAfter  ? "" : "none";
 
   if (isBefore){
     const s = Math.floor(diff / 1000);
-    el("dd").textContent = pad(Math.floor(s / 86400));
-    el("hh").textContent = pad(Math.floor(s / 3600) % 24);
-    el("mm").textContent = pad(Math.floor(s / 60) % 60);
-    el("ss").textContent = pad(s % 60);
+    const d = pad(Math.floor(s / 86400));
+    const h = pad(Math.floor(s / 3600) % 24);
+    const m = pad(Math.floor(s / 60) % 60);
+    const sec = pad(s % 60);
+    el("dd").textContent = d;
+    el("hh").textContent = h;
+    el("mm").textContent = m;
+    el("ss").textContent = sec;
+    el("streamCountdown").innerHTML =
+      d + "<i>d</i>" + h + "<i>h</i>" + m + "<i>m</i>" + sec + "<i>s</i>";
   }
 }
 tick();
@@ -310,11 +350,13 @@ setInterval(tick, 1000);
     embedUrl = "https://www.youtube.com/embed/live_stream?channel=" + YOUTUBE_CHANNEL_ID;
     watchUrl = "https://www.youtube.com/channel/" + YOUTUBE_CHANNEL_ID + "/live";
   }
-  el("watchLink").href = watchUrl;
   if (embedUrl){
+    el("watchLink").href = watchUrl;
     el("streamFrame").src = embedUrl;
     el("hasEmbed").style.display = "";
     el("noEmbed").style.display  = "none";
+  } else {
+    el("watchLink").style.display = "none";   // nothing to open yet
   }
 })();
 
