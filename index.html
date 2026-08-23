@@ -47,6 +47,11 @@ html,body{margin:0;padding:0;background:#3B060B;font-synthesis-weight:none;}
   .wish-long{display:none;}
   .wish-short{display:inline;}
 }
+/* on the narrowest phones the centred pill can reach the corner, so lift
+   the music button above it rather than shrinking the label away */
+@media (max-width:380px){
+  #music{bottom:calc(1.1rem + 64px);}
+}
 .wish-form{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:15px;}
 .wish-field{display:flex;flex-direction:column;gap:6px;text-align:left;}
 .wish-label{font-family:'Marcellus',serif;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#C9962F;}
