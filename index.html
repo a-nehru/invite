@@ -364,6 +364,8 @@ const WISHES_ACCESS_KEYS = [
   ""                                       // asekar7@outlook.com — paste its key here
 ];
 
+// Local audio file. Used when present; falls back to YouTube if it 404s.
+const MUSIC_FILE          = "assets/music.m4a";
 const MUSIC_START_SECONDS = 25;  // where the opening track starts, in seconds
 const MUSIC_VOLUME        = 28;  // 0-100, background level
 // ==================================================
@@ -508,76 +510,82 @@ setInterval(tick, 1000);
 /* ---------- background music ---------- */
 (function(){
   const btn = el("music");
-  let player, ready = false;
+  let backend = null, ready = false;
 
   function setPressed(on){
     btn.setAttribute("aria-pressed", on ? "true" : "false");
     btn.setAttribute("aria-label", on ? "Pause background music" : "Play background music");
   }
 
-  const tag = document.createElement("script");
-  tag.src = "https://www.youtube.com/iframe_api";
-  document.head.appendChild(tag);
+  /* --- preferred: a real audio file --- */
+  const audio = new Audio();
+  audio.loop = true;
+  audio.preload = "auto";
+  audio.volume = MUSIC_VOLUME / 100;
+  audio.src = MUSIC_FILE;
 
-  window.onYouTubeIframeAPIReady = function(){
-    player = new YT.Player("yt-player", {
-      playerVars:{ autoplay:1, controls:0, playsinline:1, rel:0, modestbranding:1 },
-      events:{
-        onReady(e){
-          ready = true;
-          e.target.setVolume(MUSIC_VOLUME);
-          e.target.unMute();                       // ask for sound straight away
-          e.target.loadPlaylist({
-            playlist: MUSIC_TRACKS,
-            index: 0,
-            startSeconds: MUSIC_START_SECONDS      // begin a minute in
-          });
-          e.target.setLoop(true);
+  audio.addEventListener("canplay", function(){
+    if (backend) return;
+    try { audio.currentTime = MUSIC_START_SECONDS; } catch(e){}
+    backend = {
+      play(){ audio.muted = false; audio.play().catch(function(){}); },
+      pause(){ audio.pause(); },
+      isMuted(){ return audio.muted; },
+      unmute(){ audio.muted = false; audio.play().catch(function(){}); }
+    };
+    ready = true;
+    // ask for sound outright; drop to muted if the browser refuses
+    audio.play().then(function(){ setPressed(true); })
+                .catch(function(){ audio.muted = true; audio.play().catch(function(){}); });
+  }, { once: true });
 
-          // Most browsers block audible autoplay. If we were blocked, drop to a
-          // muted start so something is running, and unmute on the first gesture.
-          setTimeout(function(){
-            if (!player) return;
-            if (player.getPlayerState() === YT.PlayerState.PLAYING && !player.isMuted()){
-              setPressed(true);                    // sound worked outright
-            } else {
-              player.mute();
-              player.playVideo();
-            }
-          }, 1500);
-        },
-        onStateChange(e){
-          if (e.data === YT.PlayerState.PLAYING && !e.target.isMuted()) setPressed(true);
+  /* --- fallback: the YouTube player --- */
+  audio.addEventListener("error", function(){
+    if (backend) return;
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+
+    window.onYouTubeIframeAPIReady = function(){
+      const player = new YT.Player("yt-player", {
+        playerVars:{ autoplay:1, controls:0, playsinline:1, rel:0, modestbranding:1 },
+        events:{
+          onReady(e){
+            backend = {
+              play(){ e.target.unMute(); e.target.playVideo(); },
+              pause(){ e.target.pauseVideo(); },
+              isMuted(){ return e.target.isMuted(); },
+              unmute(){ e.target.unMute(); e.target.playVideo(); }
+            };
+            ready = true;
+            e.target.setVolume(MUSIC_VOLUME);
+            e.target.unMute();
+            e.target.loadPlaylist({ playlist: MUSIC_TRACKS, index: 0, startSeconds: MUSIC_START_SECONDS });
+            e.target.setLoop(true);
+            setTimeout(function(){
+              if (e.target.getPlayerState() === YT.PlayerState.PLAYING && !e.target.isMuted()) setPressed(true);
+              else { e.target.mute(); e.target.playVideo(); }
+            }, 1500);
+          }
         }
-      }
-    });
-  };
+      });
+    };
+  }, { once: true });
 
-  // First gesture anywhere unmutes, for the browsers that blocked us above.
-  // Taps on the button itself are skipped so its own handler isn't double-fired.
+  /* Browsers block audible autoplay; the first gesture anywhere unmutes.
+     Taps on the button itself are skipped so its own handler is not double-fired. */
   function wake(ev){
     if (ev && ev.target && ev.target.closest && ev.target.closest("#music")) return;
-    if (!ready) return;
-    if (player.isMuted && player.isMuted()){
-      player.unMute();
-      player.setVolume(MUSIC_VOLUME);
-      player.playVideo();
-      setPressed(true);
-    }
-    ["pointerdown","keydown","touchstart"].forEach(e => document.removeEventListener(e, wake));
+    if (!ready || !backend) return;
+    if (backend.isMuted()){ backend.unmute(); setPressed(true); }
+    ["pointerdown","keydown","touchstart"].forEach(function(e){ document.removeEventListener(e, wake); });
   }
-  ["pointerdown","keydown","touchstart"].forEach(e => document.addEventListener(e, wake, {passive:true}));
+  ["pointerdown","keydown","touchstart"].forEach(function(e){ document.addEventListener(e, wake, {passive:true}); });
 
   btn.addEventListener("click", function(){
-    if (!ready) return;
+    if (!ready || !backend) return;
     const on = btn.getAttribute("aria-pressed") === "true";
-    if (on){
-      player.pauseVideo();
-    } else {
-      player.unMute();
-      player.setVolume(MUSIC_VOLUME);
-      player.playVideo();
-    }
+    if (on) backend.pause(); else backend.play();
     setPressed(!on);
   });
 })();
