@@ -52,6 +52,14 @@ html,body{margin:0;padding:0;background:#3B060B;font-synthesis-weight:none;}
 @media (max-width:380px){
   #music{bottom:calc(1.1rem + 64px);}
 }
+.board{display:grid;grid-template-columns:1fr;gap:14px;max-width:660px;margin:0 auto;}
+@media (min-width:660px){.board{grid-template-columns:1fr 1fr;}}
+.wish-card{background:#F5E7CB;border:1px solid rgba(201,150,47,.6);padding:18px 20px 16px;position:relative;}
+.wish-card::after{content:'';position:absolute;top:6px;right:6px;width:7px;height:7px;background:#C9962F;opacity:.65;}
+.wish-card p.msg{margin:0;font-size:15px;line-height:1.72;color:#33190F;white-space:pre-wrap;overflow-wrap:anywhere;}
+.wish-card p.by{margin:13px 0 0;font-family:'Marcellus',serif;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:#C9962F;}
+.board-empty{text-align:center;margin:0;font-size:14px;color:#C9962F;line-height:1.9;}
+.board-count{text-align:center;margin:0 0 22px;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#C9962F;}
 .wish-form{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:15px;}
 .wish-field{display:flex;flex-direction:column;gap:6px;text-align:left;}
 .wish-label{font-family:'Marcellus',serif;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#C9962F;}
@@ -313,6 +321,25 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
       </p>
     </section>
 
+    <div style="display:flex;align-items:center;gap:16px;padding:40px clamp(16px,6vw,56px) 0;" aria-hidden="true">
+      <div style="flex:1;height:1px;background:#C9962F;opacity:.55;"></div>
+      <svg width="54" height="32" viewBox="0 0 118 66"><g fill="none" stroke="#C9962F" stroke-width="3"><circle cx="59" cy="19" r="13"></circle><circle cx="59" cy="47" r="13"></circle><circle cx="45" cy="33" r="13"></circle><circle cx="73" cy="33" r="13"></circle></g><circle cx="59" cy="33" r="4" fill="#5E0B12"></circle></svg>
+      <div style="flex:1;height:1px;background:#C9962F;opacity:.55;"></div>
+    </div>
+
+    <section id="wishBoard" style="padding:32px clamp(16px,6vw,56px) 0;">
+      <div style="text-align:center;">
+        <h2 style="margin:0;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-weight:400;font-size:clamp(22px,4vw,28px);color:#5E0B12;">வாழ்த்து பலகை</h2>
+        <p style="margin:6px 0 8px;font-family:'Marcellus',serif;font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:#C9962F;">The wish board</p>
+        <p class="board-count" id="boardCount"></p>
+      </div>
+      <div class="board" id="boardList"></div>
+      <p class="board-empty" id="boardEmpty">
+        இன்னும் வாழ்த்துகள் சேரவில்லை<br>
+        <span style="font-family:'Marcellus',serif;font-size:11px;letter-spacing:.26em;text-transform:uppercase;">Be the first to leave one</span>
+      </p>
+    </section>
+
     <footer style="text-align:center;padding:32px clamp(16px,6vw,56px) 48px;">
       <p style="margin:0 auto;max-width:44em;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-size:clamp(15px,2.6vw,18px);line-height:2;color:#5E0B12;">அன்பும் அறனும் உடைத்தாயின் இல்வாழ்க்கை<br>பண்பும் பயனும் அது</p>
       <p style="margin:8px 0 28px;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#C9962F;">— குறள் 71</p>
@@ -499,7 +526,7 @@ setInterval(tick, 1000);
     .then(function(results){
       if (results.some(Boolean)){          // at least one inbox has it
         form.reset();
-        say("நன்றி — your wish has reached us.");
+        say("நன்றி — your wish has reached us, and will appear on the board shortly.");
         send.textContent = "Sent";
       } else {
         send.disabled = false;
@@ -507,6 +534,33 @@ setInterval(tick, 1000);
       }
     });
   });
+})();
+
+/* ---------- wish board ---------- */
+(function(){
+  const list = el("boardList"), empty = el("boardEmpty"), count = el("boardCount");
+
+  function esc(t){
+    return String(t).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  fetch("wishes.json", { cache: "no-store" })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(items){
+      if (!Array.isArray(items) || !items.length) return;
+      list.innerHTML = items.map(function(w){
+        const by = [w.name, w.place].filter(Boolean).map(esc).join(" · ");
+        return '<article class="wish-card">' +
+                 '<p class="msg">' + esc(w.message || "") + '</p>' +
+                 (by ? '<p class="by">' + by + '</p>' : '') +
+               '</article>';
+      }).join("");
+      count.textContent = items.length + (items.length === 1 ? " wish" : " wishes");
+      empty.style.display = "none";
+    })
+    .catch(function(){ /* no file yet: the empty state already says so */ });
 })();
 
 /* ---------- background music ---------- */
