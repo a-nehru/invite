@@ -35,9 +35,18 @@ html,body{margin:0;padding:0;background:#3B060B;font-synthesis-weight:none;}
 .stream-en{margin:0;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#EBCB84;}
 .stream-cd{margin:8px 0 0;font-family:'Marcellus',serif;font-size:clamp(24px,5.6vw,38px);color:#C9962F;font-variant-numeric:tabular-nums;letter-spacing:.04em;}
 .stream-cd i{font-style:normal;font-size:.46em;color:#EBCB84;opacity:.72;margin:0 .55em 0 .12em;}
-.wish-jump{display:inline-flex;align-items:center;gap:8px;margin-top:22px;background:transparent;color:#5E0B12;font-family:'Marcellus',serif;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;padding:11px 22px;border:1.5px solid #C9962F;cursor:pointer;transition:background .2s ease,color .2s ease;}
-.wish-jump:hover{background:#5E0B12;color:#EBCB84;}
-.wish-jump:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
+/* floating call to action, centred so it is hard to miss */
+#wishJump{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);z-index:60;display:inline-flex;align-items:center;gap:11px;height:56px;padding:0 28px;border-radius:28px;background:#5E0B12;color:#EBCB84;border:2px solid #C9962F;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-weight:400;font-size:18px;line-height:1;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.5);transition:transform .2s ease,background .2s ease;}
+#wishJump:hover{transform:translateX(-50%) scale(1.05);background:#C9962F;color:#3B060B;}
+#wishJump:focus-visible{outline:3px solid #EBCB84;outline-offset:4px;}
+#wishJump svg{width:21px;height:21px;fill:currentColor;flex:none;}
+.wish-short{display:none;}
+/* shorten the label before it can reach the music button in the corner */
+@media (max-width:520px){
+  #wishJump{font-size:16.5px;height:52px;padding:0 22px;gap:9px;}
+  .wish-long{display:none;}
+  .wish-short{display:inline;}
+}
 .wish-form{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:15px;}
 .wish-field{display:flex;flex-direction:column;gap:6px;text-align:left;}
 .wish-label{font-family:'Marcellus',serif;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#C9962F;}
@@ -63,7 +72,7 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
 .backdrop{
   position:relative;min-height:100vh;
   background:#3B060B url('assets/backdrop.png') center/cover no-repeat fixed;
-  padding:clamp(14px,4vw,56px) clamp(8px,3vw,32px);
+  padding:clamp(14px,4vw,56px) clamp(8px,3vw,32px) calc(1.1rem + 92px);
   box-sizing:border-box;font-family:'Mukta Malar',sans-serif;color:#33190F;
 }
 /* background-attachment:fixed is ignored on most mobile browsers — scroll there */
@@ -145,7 +154,6 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
       </div>
       <p style="margin:26px auto 0;max-width:44em;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-size:clamp(15px,2.6vw,18px);line-height:2;color:#5E0B12;animation:fadeUp .8s ease .3s both;">எங்கள் திருமண முகூர்த்தத்தை நேரலையில் கண்டு, உங்கள் அன்பான ஆசிகளை வழங்குமாறு அன்புடன் அழைக்கிறோம்.</p>
       <p style="margin:10px auto 0;max-width:46em;font-size:13px;color:#C9962F;">We warmly invite you to watch our wedding muhurtham live and bless us.</p>
-      <button type="button" class="wish-jump" id="wishJump">வாழ்த்து சொல்லுங்கள் · Leave a wish</button>
     </header>
 
     <div style="display:flex;align-items:center;gap:16px;padding:40px clamp(16px,6vw,56px) 0;" aria-hidden="true">
@@ -320,6 +328,10 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
   </main>
 </div>
 
+<button type="button" id="wishJump" aria-label="Send your wishes" title="Send your wishes">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v.4l-10 6.3L2 5.4z"/><path d="M22 7.6V19a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.6l10 6.3z"/></svg>
+  <span class="wish-long">வாழ்த்து சொல்லுங்கள்</span><span class="wish-short">வாழ்த்து</span>
+</button>
 <button id="music" aria-pressed="false" aria-label="Play background music" title="Music">
   <svg class="playing" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.6A4 4 0 1 0 14 17V7.5h4V3z"/></svg>
   <svg class="muted" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.6A4 4 0 1 0 14 17V7.5h4V3z" opacity=".4"/><path d="M4.2 3.1 20.9 19.8l-1.4 1.4L2.8 4.5z"/></svg>
