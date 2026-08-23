@@ -337,9 +337,12 @@ const MUSIC_TRACKS = [
   "1joa2NU0Sno",
   "zkvNnRjIhPE"
 ];
-// Wishes form — get a free access key at https://web3forms.com (takes a minute)
-const WISHES_ACCESS_KEY = "4c2ff39b-18ad-4edc-a7d1-990d4ca6b5c0";                        // paste the key here
-const WISHES_CC         = "asekar7@outlook.com";     // second recipient
+// Wishes form. Web3Forms CC is a paid feature, so each recipient gets its own
+// free access key and the wish is posted to both. Create keys at web3forms.com.
+const WISHES_ACCESS_KEYS = [
+  "4c2ff39b-18ad-4edc-a7d1-990d4ca6b5c0",  // nehru.aravind@gmail.com
+  ""                                       // asekar7@outlook.com — paste its key here
+];
 
 const MUSIC_START_SECONDS = 25;  // where the opening track starts, in seconds
 const MUSIC_VOLUME        = 28;  // 0-100, background level
@@ -432,7 +435,8 @@ setInterval(tick, 1000);
   const form = el("wishForm"), status = el("wishStatus"), send = el("wishSend");
 
   // No key configured yet: show a holding line rather than a form that fails.
-  if (!WISHES_ACCESS_KEY){
+  const KEYS = WISHES_ACCESS_KEYS.filter(function(k){ return k && k.trim(); });
+  if (!KEYS.length){
     form.style.display = "none";
     el("wishClosed").style.display = "";
     if (jump) jump.style.display = "none";
@@ -458,21 +462,25 @@ setInterval(tick, 1000);
     send.disabled = true;
     say("Sending…");
 
-    fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({
-        access_key: WISHES_ACCESS_KEY,
-        cc: WISHES_CC,
-        subject: "A wedding wish from " + name,
-        from_name: "Aravind & Anupama invitation",
-        name: name,
-        message: wish
+    const payload = {
+      subject: "A wedding wish from " + name,
+      from_name: "Aravind & Anupama invitation",
+      name: name,
+      message: wish
+    };
+
+    Promise.all(KEYS.map(function(key){
+      return fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(Object.assign({ access_key: key }, payload))
       })
-    })
-    .then(function(r){ return r.json().catch(function(){ return {success:false}; }); })
-    .then(function(d){
-      if (d && d.success){
+      .then(function(r){ return r.json(); })
+      .then(function(d){ return !!(d && d.success); })
+      .catch(function(){ return false; });
+    }))
+    .then(function(results){
+      if (results.some(Boolean)){          // at least one inbox has it
         form.reset();
         say("நன்றி — your wish has reached us.");
         send.textContent = "Sent";
@@ -480,10 +488,6 @@ setInterval(tick, 1000);
         send.disabled = false;
         say("That didn't send. Please try again in a moment.", false);
       }
-    })
-    .catch(function(){
-      send.disabled = false;
-      say("That didn't send — check your connection and try again.", false);
     });
   });
 })();
