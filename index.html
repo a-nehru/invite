@@ -313,11 +313,7 @@ a:focus-visible{outline:3px solid #C9962F;outline-offset:3px;}
         <p class="wish-status" id="wishStatus" role="status" aria-live="polite"></p>
       </form>
 
-      <p id="wishClosed" style="display:none;text-align:center;margin:0;font-size:14px;color:#C9962F;">
-        வாழ்த்து பெட்டி விரைவில் திறக்கும்<br>
-        <span style="font-family:'Marcellus',serif;font-size:11px;letter-spacing:.26em;text-transform:uppercase;">Wishes open shortly</span>
-      </p>
-    </section>
+</section>
 
         <footer style="text-align:center;padding:32px clamp(16px,6vw,56px) 48px;">
       <p style="margin:0 auto;max-width:44em;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-size:clamp(15px,2.6vw,18px);line-height:2;color:#5E0B12;">அன்பும் அறனும் உடைத்தாயின் இல்வாழ்க்கை<br>பண்பும் பயனும் அது</p>
@@ -459,13 +455,6 @@ setInterval(tick, 1000);
 
   // No key configured yet: show a holding line rather than a form that fails.
   const KEYS = WISHES_ACCESS_KEYS.filter(function(k){ return k && k.trim(); });
-  if (!KEYS.length){
-    form.style.display = "none";
-    el("wishClosed").style.display = "";
-    if (jump) jump.style.display = "none";
-    return;
-  }
-
   function say(msg, ok){
     status.textContent = msg;
     status.style.color = ok === false ? "#8A2A1B" : "#5E0B12";
