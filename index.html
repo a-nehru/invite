@@ -31,15 +31,12 @@
 }
 html,body{margin:0;padding:0;background:#3B060B;font-synthesis-weight:none;}
 .card-mark{
-  position:absolute; top:88px; left:50%; transform:translateX(-50%);
-  width:min(80%,520px); overflow:hidden; line-height:0;
-  z-index:-1; pointer-events:none;
+  position:absolute; top:0; left:0; width:100%;
+  overflow:hidden; line-height:0; z-index:-1; pointer-events:none;
   mix-blend-mode:multiply; opacity:.15;
 }
-/* percentage margins resolve against the container's width, and the source is
-   square, so these trim exactly that share of the image's height */
-.card-mark img{display:block;width:100%;height:auto;margin-top:-11%;margin-bottom:-12%;}
-@media (max-width:600px){.card-mark{top:70px;width:90%;opacity:.13;}}
+.card-mark img{display:block;width:100%;height:auto;}
+@media (max-width:600px){.card-mark{opacity:.13;}}
 .stream-pane{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;padding:20px;box-sizing:border-box;}
 .stream-ta{margin:0;font-family:'TAU Ponni','Noto Serif Tamil',serif;font-size:clamp(16px,3.4vw,20px);color:#F5E7CB;}
 .stream-en{margin:0;font-family:'Marcellus',serif;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#EBCB84;}
